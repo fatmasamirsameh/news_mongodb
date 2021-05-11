@@ -2,6 +2,7 @@ const express = require('express')
 const  router = new express.Router()
 const News = require('../models/news')
 const auth = require('../middleware/auth')
+const multer = require('multer')
 
 
 // router.post('/news',async(req,res)=>{
@@ -19,7 +20,7 @@ const auth = require('../middleware/auth')
 
 router.post('/news',auth,async(req,res)=>{
   
-    const news = new News({...req.body,owner:req.news._id})
+    const news = new News({...req.body,owner:req.reporter._id})
     try{
         await news.save()
         res.status(200).send(news)
@@ -42,29 +43,30 @@ router.get('/news',async(req,res)=>{
 
 // router.get('/news',auth,async(req,res)=>{
 //     try{
-//         const news = await News.find({owner:req.user._id})
+//         const news = await News.find({owner:req.reporter._id})
 //         res.send(news)
 //     }catch(e){
 //         res.status(500).send(e)
 //     }
 // })
+///////////////////////////////////////////
+router.get('/news',auth,async(req,res)=>{
+
+    try{
+        await req.reporter.populate({
+            path:'news',
+            options:{
+                limit:parseInt(req.query.limit),
+                skip:parseInt(req.query.skip),
+            }
+        }).execPopulate()
+        res.send(req.reporter.news)
+    }catch(e){
+        res.status(500).send(e)
+    }
+})
 
 
-// router.get('/tasks/:id',async(req,res)=>{
-//     const _id = req.params.id
-//     try{
-//        // _id
-//        // owner : req.user._id
-//         const task = await Task.findById(_id)
-//         if(!task){
-//             return res.status(400).send('No task is found')
-//         }
-//         res.send(task)
-//     }
-//     catch(e){
-//         res.status(500).send(e)
-//     }
-// })
 
 /////////////////////////////////////////////////////////////////////////////
 
@@ -74,7 +76,7 @@ router.get('/news/:id',auth,async(req,res)=>{
     const _id = req.params.id
     try{
       
-        const news = await News.findOne({_id,owner:req.news._id})
+        const news = await News.findOne({_id,owner:req.reporter._id})
         if(!news){
             return res.status(400).send('No news is found')
         }
@@ -104,47 +106,47 @@ router.get('/news/:id',auth,async(req,res)=>{
 
 ////////////////////////////////////////////////////////////////////////////////////
 
-// router.patch('/news/:id',auth,async(req,res)=>{
-//     const _id = req.params.id
-//     const updates = Object.keys(req.body) 
-//     try{
-//         const news = await News.findOne({_id,owner:req.news._id})
-//         if(!news){
-//             return res.status(404).send()
-//         }
-//         updates.forEach((update) => news[update]= req.body[update])
+router.patch('/news/:id',auth,async(req,res)=>{
+    const _id = req.params.id
+    const updates = Object.keys(req.body) 
+    try{
+        const news = await News.findOne({_id,owner:req.reporter._id})
+        if(!news){
+            return res.status(404).send()
+        }
+        updates.forEach((update) => news[update]= req.body[update])
 
-//         await news.save()
-//         res.send(news)
-//     }catch(e){
-//         res.send(e)
-//     }
-// })
+        await news.save()
+        res.send(news)
+    }catch(e){
+        res.send(e)
+    }
+})
 
 //////////////////////////////////////////////////////////////////////////////////////
 
-router.delete('/news/:id',async(req,res)=>{
-    try{
-        const news = await News.findByIdAndDelete(req.params.id)
-        if(!news){
-            return res.status(400).send()
-        }
-        res.send(news)
-    }
-    catch(e){
-        res.status(500).send()
-    }
-})
+// router.delete('/news/:id',async(req,res)=>{
+//     try{
+//         const news = await News.findByIdAndDelete(req.params.id)
+//         if(!news){
+//             return res.status(400).send()
+//         }
+//         res.send(news)
+//     }
+//     catch(e){
+//         res.status(500).send()
+//     }
+// })
 
 
 router.delete('/news/:id',auth,async(req,res)=>{
     const _id = req.params.id
     try{
-        const news = await News.findOneAndDelete({_id,owner:req.news._id})
+        const news = await News.findOneAndDelete({_id,owner:req.reporter._id})
         if(!news){
             return res.status(400).send()
         }
-        res.send('Deleted')
+        res.send(news)
     }
     catch(e){
         res.status(500).send()

@@ -15,6 +15,9 @@ const newsSchema = new mongoose.Schema(
         required: true,
        
     },
+    avatar:{
+    type:Buffer
+    },
     
     owner:{
         type: mongoose.Schema.Types.ObjectId,

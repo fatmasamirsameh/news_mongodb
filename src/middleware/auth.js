@@ -1,17 +1,19 @@
 const jwt = require('jsonwebtoken')
 const Reporter= require('../models/reporter')
+
+
 const auth = async(req,res,next) =>{
 
     try{
-        const token = req.header('Authorization').replace('Bearer ','')
+        const token = req.header('Authorization').replace('Bearer ', '')
       
 
-        const decode = jwt.verify(token,'news api')
+        const decode = jwt.verify(token,'node course')
        
 
         const reporter = await Reporter.findOne({_id:decode._id , 'tokens.token':token})
 
-        if(reporter){
+        if(!reporter){
             throw new Error('Error has occurred')
         }
 

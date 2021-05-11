@@ -53,8 +53,8 @@ router.get('/profile',auth,async(req,res)=>{
 //////////////////////////////////////////////////////////////////////////////////
 // Get all 
 
-router.get('/reporters',auth,(req,res)=>{
-    Reporter.find({}).then((reporters)=>{
+router.get('/reporters',auth,(req,res) => {
+    Reporter.find({}).then((reporters) => {
         res.status(200).send(reporters)
     }).catch((e)=>{
         res.status(500).send(e)
@@ -170,7 +170,7 @@ router.post('/logout',auth,async(req,res)=>{
 
 /////////////////////////////////////////////////////////
 
-router.post('/logoutAll',auth,async(req,res)=>{
+router.post('/logoutAll', auth,async(req,res)=>{
     try{
         req.reporter.tokens = []
         await req.reporter.save()

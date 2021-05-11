@@ -42,6 +42,9 @@ const reporterSchema = new mongoose.Schema({
             }
         }
     },
+    avatar:{
+        type:Buffer
+        },
    
 
     tokens:[{
@@ -63,8 +66,8 @@ const reporterSchema = new mongoose.Schema({
 
 // Relation 
 
-reporterSchema.virtual('reporters',{
-    ref:'Reporter',
+reporterSchema.virtual('news',{
+    ref:'News',
     localField: '_id',
     foreignField:'owner'
 
